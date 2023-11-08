@@ -1,0 +1,152 @@
+esphome:
+  name: sph6000
+  friendly_name: sph6000
+
+# esp32:
+#   board: az-delivery-devkit-v4
+#   framework:
+#     type: arduino
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: !secret ssid
+  password: !secret wifi_pwd
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ""
+    password: ""
+
+  manual_ip:
+    static_ip: xxx
+    gateway: xxx
+    subnet: xxx    
+
+
+captive_portal:
+
+# Enable logging
+logger:
+  baud_rate: 0
+
+web_server:
+  port: 80
+    
+uart:
+  - id: gw_uart
+    baud_rate: 9600
+    tx_pin: GPIO1
+    rx_pin: GPIO3
+
+modbus:
+  uart_id: gw_uart
+  flow_control_pin: GPIO4
+
+
+binary_sensor:
+  - platform: status
+    name: "SPH6000 Status"  
+
+sensor:
+  - platform: wifi_signal
+    name: "SPH6000 WiFi Signal Sensor"
+    update_interval: 60s
+  - platform: uptime
+    name: "SPH6000 Uptime Sensor"      
+
+  - platform: growatt_solar
+    update_interval: 10s
+    protocol_version: RTU
+
+    inverter_status:
+      name: "SPH6000 Status Code"
+
+    phase_a:
+      voltage:
+          name: "SPH6000 Voltage Phase A"
+      current:
+          name: "SPH6000 Current Phase A"
+      active_power:
+          name: "SPH6000 Power Phase A"
+    phase_b:
+      voltage:
+          name: "SPH6000 Voltage Phase B"
+      current:
+          name: "SPH6000 Current Phase B"
+      active_power:
+          name: "SPH6000 Power Phase B"
+    phase_c:
+      voltage:
+          name: "SPH6000 Voltage Phase C"
+      current:
+          name: "SPH6000 Current Phase C"
+      active_power:
+          name: "SPH6000 Power Phase C"
+
+    pv1:
+      voltage:
+          name: "SPH6000 PV1 Voltage"
+      current:
+          name: "SPH6000 PV1 Current"
+      active_power:
+          name: "SPH6000 PV1 Active Power"
+
+    pv2:
+      voltage:
+          name: "SPH6000 PV2 Voltage"
+      current:
+          name: "SPH6000 PV2 Current"
+      active_power:
+          name: "SPH6000 PV2 Active Power"
+
+    active_power:
+      name: "SPH6000 Grid Active Power"
+
+    pv_active_power:
+      name: "SPH6000 PV Active Power"
+
+    frequency:
+      name: "SPH6000 Frequency"
+
+    energy_production_day:
+      name: "SPH6000 Today's Generation"
+
+    total_energy_production:
+      name: "SPH6000 Total Energy Production"
+
+    inverter_module_temp:
+      name: "SPH6000 Inverter Module Temp"
+
+light:
+  - platform: status_led
+    pin: GPIO23
+    id: led_status_light
+    restore_mode: ALWAYS_ON
+    internal: true
+    effects:
+    - strobe:
+        name: "Slow Blink" # 0.1s on, 2s off
+        colors:
+          - state: true
+            brightness: 100%
+            duration: 100ms
+          - state: false
+            duration: 2s
+    on_turn_on:
+      - light.turn_on:
+          id: led_status_light
+          effect: "Slow Blink"     
